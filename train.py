@@ -114,6 +114,7 @@ def cli_main():
     parser.add_argument("--resize", default=False, type=bool, help="Pre-Resize data to right shape to reduce cuda memory requirements of reading large images")
     parser.add_argument("--technique", default=None, type=str, help="SIMCLR, SIMSIAM or CLASSIFIER")
     parser.add_argument("--seed", default=1729, type=int, help="random seed for run for reproducibility")
+    parser.add_argument("--accelerator", default='dpps', type=str, help="pytorch accelerator")
 
     #add ability to parse unknown args
     args, _ = parser.parse_known_args()
@@ -152,7 +153,7 @@ def cli_main():
         
         
     trainer = pl.Trainer(gpus=args.gpus, max_epochs = args.epochs, progress_bar_refresh_rate=20,
-                         callbacks = cbs, accelerator=f'{backend}' if args.gpus > 1 else None,
+                         callbacks = cbs, accelerator= args.accelerator, if args.gpus > 1 else None,
                          sync_batchnorm=True if args.gpus > 1 else False, logger = wandb_logger)
     trainer.fit(model)
 

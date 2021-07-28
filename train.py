@@ -144,14 +144,16 @@ def cli_main():
   
     
     cbs = []
-    backend = 'ddp'
+    backend = 'dp'
     
     if args.patience > 0:
         cb = EarlyStopping('val_loss', patience = args.patience)
         cbs.append(cb)
         
         
-    trainer = pl.Trainer(gpus=args.gpus, max_epochs = args.epochs, progress_bar_refresh_rate=20, callbacks = cbs, distributed_backend=f'{backend}' if args.gpus > 1 else None, sync_batchnorm=True if args.gpus > 1 else False, logger = wandb_logger)
+    trainer = pl.Trainer(gpus=args.gpus, max_epochs = args.epochs, progress_bar_refresh_rate=20,
+                         callbacks = cbs, accelerator=f'{backend}' if args.gpus > 1 else None,
+                         sync_batchnorm=True if args.gpus > 1 else False, logger = wandb_logger)
     trainer.fit(model)
 
     Path(f"./models/").mkdir(parents=True, exist_ok=True)
